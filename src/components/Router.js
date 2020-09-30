@@ -5,34 +5,39 @@ import Auth from "routes/Auth";
 import Navigation from "./Navigation";
 import Profile from "routes/Profile";
 
-const AppRouter = ({isLoggedIn,userObj}) => {
+const AppRouter = ({refreshUser,isLoggedIn,userObj}) => {
     return (
         <Router>
-            {isLoggedIn && <Navigation/>}
+            {isLoggedIn && <Navigation userObj={userObj}/>}
             <Switch>
                 {isLoggedIn ? (
-                    <>
+                    <div
+                        style={{
+                            maxWidth: 890,
+                            width: "100%",
+                            margin: "0 auto",
+                            marginTop: 80,
+                            display: "flex",
+                            justifyContent: "center",
+                        }}
+                    >
                         <Route exact path="/">
                             <Home userObj={userObj} />
                         {/*    props 전달  */}
                         </Route>
                         <Route exact path="/profile">
-                            <Profile/>
+                            <Profile userObj={userObj} refreshUser={refreshUser}/>
                         </Route>
-                        <Redirect from="*" to="/"/>
-                    </>
+                    </div>
                 ) : (
                     <>
                         <Route exact path="/">
                             <Auth/>
                         </Route>
-                        <Redirect from="*" to="/"/>
                     </>
                 )}
             </Switch>
         </Router>
-
     )
 }
-
 export default AppRouter;

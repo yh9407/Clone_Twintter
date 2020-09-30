@@ -1,5 +1,7 @@
 import React, {useState} from "react";
-import {dbService} from "../fbase";
+import {dbService, storageService} from "../fbase";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faTrash, faPencilAlt} from "@fortawesome/free-solid-svg-icons";
 
 const Tweet = ({tweetObj, isOwner}) => {
     const [editing, setEditing] = useState(false);
@@ -10,6 +12,7 @@ const Tweet = ({tweetObj, isOwner}) => {
         const ok = window.confirm("ARE YOU SURE U WANT TO DELETE THIS TWEET??")
         if (ok) {
             await dbService.doc(`tweets/${tweetObj.id}`).delete();
+            await storageService.refFromURL(tweetObj.attachmentUrl).delete();
             //collect 안에 id 값
             //delete
         }
@@ -29,13 +32,14 @@ const Tweet = ({tweetObj, isOwner}) => {
         } = event;
         setNewTweet(value);
     }
+    //isOwner 가 true 값이 아니라면, Delete,Edit 버튼 및 inputBox 가 보이지 않게 함.
     return (
-        <div>
+        <div className="nweet">
             {
                 editing ? (
                     <>
                         {isOwner && <>
-                            <form onSubmit={onSubmit}>
+                            <form onSubmit={onSubmit} className="container nweetEdit">
                                 <input
                                     type="text"
                                     placeholder="Edit your Tweet"
@@ -43,19 +47,26 @@ const Tweet = ({tweetObj, isOwner}) => {
                                     required
                                     onChange={onChange}
                                 />
-                                <input type="submit" value="Update Tweet"/>
+                                <input type="submit" value="Update Nweet" className="formBtn"/>
                             </form>
-                            <button onClick={toggleEditing}>Cancel</button>
+                            <span onClick={toggleEditing} className="formBtn cancelBtn">
+                                    Cancel
+                                  </span>
                         </>}
                     </>
                 ) : (
                     <>
                         <h4>{tweetObj.text}</h4>
+                        {tweetObj.attachmentUrl && <img src={tweetObj.attachmentUrl}/>}
                         {isOwner && (
-                            <>
-                                <button onClick={onDeleteClick}>Delete Tweet</button>
-                                <button onClick={toggleEditing}>Edit Tweet</button>
-                            </>
+                            <div className="nweet__actions">
+                              <span onClick={onDeleteClick}>
+                                <FontAwesomeIcon icon={faTrash}/>
+                              </span>
+                                <span onClick={toggleEditing}>
+                                <FontAwesomeIcon icon={faPencilAlt}/>
+                              </span>
+                            </div>
                         )}
                     </>
                 )
